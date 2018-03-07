@@ -1,0 +1,7 @@
+[package]
+name = "conways_GoL"
+version = "0.1.0"
+authors = ["MaxMachon <pragma8123@gmail.com>"]
+
+[dependencies]
+colored = "1.6"
