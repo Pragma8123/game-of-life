@@ -1,6 +1,5 @@
 use std::thread::sleep;
 use std::time::{Duration, Instant};
-use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -38,13 +37,13 @@ fn get_input() -> [[bool; 50]; 50] {
 
   // Open read only
   let mut file = match File::open(&path) {
-    Err(why) => panic!("couldn't open {}: {}", display, why.description()),
+    Err(why) => panic!("couldn't open {}: {}", display, why.to_string()),
     Ok(file) => file,
   };
 
   let mut s = String::new();
   match file.read_to_string(&mut s) {
-    Err(why) => panic!("couldn't read {}: {}", display, why.description()),
+    Err(why) => panic!("couldn't read {}: {}", display, why.to_string()),
     Ok(_) => {},
   };
 
@@ -79,10 +78,10 @@ fn tick(grid: [[bool; 50]; 50]) -> [[bool; 50]; 50] {
       let mut neighbors: u8 = 0;
       let x: i64 = i as i64;
       let y: i64 = j as i64;
-      let xm: usize = rem((x - 1), 50) as usize;
-      let xp: usize = rem((x + 1), 50) as usize;
-      let ym: usize = rem((y - 1), 50) as usize;
-      let yp: usize = rem((y + 1), 50) as usize;
+      let xm: usize = rem(x - 1, 50) as usize;
+      let xp: usize = rem(x + 1, 50) as usize;
+      let ym: usize = rem(y - 1, 50) as usize;
+      let yp: usize = rem(y + 1, 50) as usize;
 
       if grid[i][ym] { neighbors += 1; }
       if grid[i][yp] { neighbors += 1; }
