@@ -38,13 +38,13 @@ fn get_input() -> [[bool; 50]; 50] {
 
   // Open read only
   let mut file = match File::open(&path) {
-    Err(why) => panic!("couldn't open {}: {}", display, why.description()),
+    Err(why) => panic!("couldn't open {}: {}", display, why.to_string()),
     Ok(file) => file,
   };
 
   let mut s = String::new();
   match file.read_to_string(&mut s) {
-    Err(why) => panic!("couldn't read {}: {}", display, why.description()),
+    Err(why) => panic!("couldn't read {}: {}", display, why.to_string()),
     Ok(_) => {},
   };
 
