@@ -1,24 +1,38 @@
-extern crate colored;
-
-use std::{thread, time};
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use colored::*;
 
 fn main() {
-  let mut grid: [[bool; 30]; 30] = get_input();
+  let mut grid: [[bool; 50]; 50] = get_input();
+
+  let tick_time = Duration::from_millis(100); // 10 TPS
+
+  let mut ticks: u64 = 0;
 
   // main game loop
   loop {
-    draw(grid);
+    let now = Instant::now();
+
+    draw(&grid);
+    println!("Ticks: {}", ticks);
     grid = tick(grid);
-    thread::sleep(time::Duration::from_millis(100));
+    ticks += 1;
+
+    let mut sleep_time = tick_time.checked_sub(now.elapsed());
+    if sleep_time == None {
+      sleep_time = Some(Duration::from_millis(0));
+    }
+    println!(
+      "Frame Time: {:.3}ms",
+      tick_time.checked_sub(sleep_time.unwrap()).unwrap().subsec_nanos() as f64 * 1e-6);
+    sleep(sleep_time.unwrap());
   }
 }
 
-fn get_input() -> [[bool; 30]; 30] {
+fn get_input() -> [[bool; 50]; 50] {
   let path = Path::new("input.txt");
   let display = path.display();
 
@@ -34,14 +48,14 @@ fn get_input() -> [[bool; 30]; 30] {
     Ok(_) => {},
   };
 
-  let mut grid: [[bool; 30]; 30] = [[false; 30]; 30];
-  let mut x: usize = 0;
+  let mut grid: [[bool; 50]; 50] = [[false; 50]; 50];
+  let mut x: usize;
   let mut y: usize = 0;
   for i in s.split('\n') {
     x = 0;
     for j in i.split("") {
       if j == "1" {
-        grid[y % 30][x % 30] = true;
+        grid[y % 50][x % 50] = true;
       }
       x += 1;
     }
@@ -56,18 +70,19 @@ fn rem(a: i64, b: i64) -> i64 {
   ((a % b) + b) % b
 }
 
-fn tick(grid: [[bool; 30]; 30]) -> [[bool; 30]; 30] {
-  let mut next: [[bool; 30]; 30] = [[false; 30]; 30];
-  for i in 0..30 {
-    for j in 0..30 {
+fn tick(grid: [[bool; 50]; 50]) -> [[bool; 50]; 50] {
+  let mut next: [[bool; 50]; 50] = [[false; 50]; 50];
+  for i in 0..50 {
+    for j in 0..50 {
       // Check neighbors
+      // TODO: Find a better way to do this
       let mut neighbors: u8 = 0;
       let x: i64 = i as i64;
       let y: i64 = j as i64;
-      let xm: usize = rem((x - 1), 30) as usize;
-      let xp: usize = rem((x + 1), 30) as usize;
-      let ym: usize = rem((y - 1), 30) as usize;
-      let yp: usize = rem((y + 1), 30) as usize;
+      let xm: usize = rem((x - 1), 50) as usize;
+      let xp: usize = rem((x + 1), 50) as usize;
+      let ym: usize = rem((y - 1), 50) as usize;
+      let yp: usize = rem((y + 1), 50) as usize;
 
       if grid[i][ym] { neighbors += 1; }
       if grid[i][yp] { neighbors += 1; }
@@ -92,21 +107,21 @@ fn tick(grid: [[bool; 30]; 30]) -> [[bool; 30]; 30] {
   next
 }
 
-fn draw(grid: [[bool; 30]; 30]) {
+fn draw(grid: &[[bool; 50]; 50]) {
   // Clear screen
   print!("{}[2J", 27 as char);
 
-  println!(" -------------------------------------------------------------");
-  for i in &grid {
+  println!(" -----------------------------------------------------------------------------------------------------");
+  for x in 0..50 {
     print!("| ");
-    for j in i {
-      if *j {
-        print!("{} ", "*".blue().bold());
+    for y in 0..50 {
+      if grid[x][y] {
+        print!("* ");
       } else {
         print!("  ");
       }
     }
     println!("|");
   }
-  println!(" -------------------------------------------------------------");
+  println!(" -----------------------------------------------------------------------------------------------------");
 }
