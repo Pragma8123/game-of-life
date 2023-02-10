@@ -1,7 +1,8 @@
 [package]
-name = "conways_gol"
+name = "game_of_life"
 version = "0.1.0"
-authors = ["MaxMachon <pragma8123@gmail.com>"]
+authors = ["Max Machon <pragma8123@gmail.com>"]
 
 [dependencies]
-colored = "1.6"
+drawille = "*"
+rand = "*"
