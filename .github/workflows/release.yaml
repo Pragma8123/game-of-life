@@ -18,6 +18,9 @@ jobs:
           node-version: 16
           cache: "npm"
 
+      - name: Install release dependencies
+        run: npm ci
+
       - name: Setup rust
         uses: ATiltedTree/setup-rust@v1
         with:
@@ -31,12 +34,6 @@ jobs:
 
       - name: Test
         run: cargo test
-
-      - name: Add semantic-release plugins
-        run: |
-          npm install -g @semantic-release/git
-          npm install -g @semantic-release/changelog
-          npm install -g @semantic-release/exec
 
       - name: Release
         run: npx semantic-release
