@@ -1,8 +1,12 @@
 [package]
-name = "game_of_life"
-version = "0.1.0"
-authors = ["Max Machon <pragma8123@gmail.com>"]
+name = "game-of-life"
+version = "1.0.0"
+publish = false
+authors = ["Max Machon <max@machon.family>"]
+edition = "2021"
+readme = "README.md"
 
 [dependencies]
+clap = { version = "4.1.4", features = ["derive"] }
 drawille = "*"
 rand = "*"
