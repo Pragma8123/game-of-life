@@ -30,3 +30,9 @@ fn game_loop(game: &mut Game) {
         thread::sleep(time::Duration::from_millis(33));
     }
 }
+
+#[test]
+fn verify_args() {
+    use clap::CommandFactory;
+    Args::command().debug_assert()
+}
