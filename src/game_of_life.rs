@@ -74,3 +74,10 @@ impl Game {
     canvas
   }
 }
+
+#[test]
+fn verify_game() {
+  let mut game = Game::new(100, 100);
+  game.tick();
+  assert_eq!(game.generations, 1);
+}
