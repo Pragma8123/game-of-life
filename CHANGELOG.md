@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Pragma8123/game-of-life/compare/v1.1.2...v1.2.0) (2023-02-13)
+
+
+### Features
+
+* **cli:** :sparkles: add game speed cli option ([d8a058a](https://github.com/Pragma8123/game-of-life/commit/d8a058a58d8daddfc141477e8942d7a3097f206a))
+
 ## [1.1.2](https://github.com/Pragma8123/game-of-life/compare/v1.1.1...v1.1.2) (2023-02-13)
 
 
