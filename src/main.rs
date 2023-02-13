@@ -25,7 +25,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let frame_duration: Duration = Duration::from_secs(1) / args.speed as u32;
+    let frame_duration = Duration::from_secs(1) / args.speed as u32;
     let mut game = Game::new(args.width, args.height);
     loop {
         let start = Instant::now();
