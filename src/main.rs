@@ -4,7 +4,7 @@ mod game_of_life;
 
 use crate::game_of_life::Game;
 use std::{thread, time::Duration, time::Instant};
-use clap::Parser;
+use clap::{Parser, value_parser};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
@@ -18,7 +18,7 @@ struct Args {
     height: u32,
 
     /// Simulation speed in generations per second
-    #[arg(short = 'S', long, default_value = "10", )]
+    #[arg(short = 'S', long, default_value = "10", value_parser = value_parser!(u8).range(1..))]
     speed: u8,
 }
 
