@@ -9,9 +9,11 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
 struct Args {
+    /// Width of the game board
     #[arg(short = 'W', long, default_value = "100")]
     width: u32,
 
+    /// Height of the game board
     #[arg(short = 'H', long, default_value = "100")]
     height: u32,
 }
