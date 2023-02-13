@@ -1,6 +1,6 @@
 [package]
 name = "game-of-life"
-version = "1.1.1"
+version = "1.1.2"
 publish = false
 authors = ["Max Machon <max@machon.family>"]
 edition = "2021"

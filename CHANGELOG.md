@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Pragma8123/game-of-life/compare/v1.1.1...v1.1.2) (2023-02-13)
+
+
+### Bug Fixes
+
+* ensure Cargo.lock gets updated version on release ([87978a4](https://github.com/Pragma8123/game-of-life/commit/87978a4fcf14f462578972427f52eff0816728bc))
+
 ## [1.1.1](https://github.com/Pragma8123/game-of-life/compare/v1.1.0...v1.1.1) (2023-02-13)
 
 
