@@ -7,7 +7,7 @@ use std::{thread, time};
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(about = "A simple implementation of Conway's Game of Life")]
+#[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
 struct Args {
     #[arg(short = 'W', long, default_value = "100")]
     width: u32,
