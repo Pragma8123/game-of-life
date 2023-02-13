@@ -5,9 +5,9 @@ use drawille::Canvas;
 use rand::Rng;
 
 pub struct Game {
-  pub canvas: Canvas,
-  pub width: u32,
-  pub height: u32,
+  canvas: Canvas,
+  width: u32,
+  height: u32,
   generations: u64,
 }
 
