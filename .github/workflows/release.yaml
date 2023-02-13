@@ -22,9 +22,9 @@ jobs:
         run: npm ci
 
       - name: Setup rust
-        uses: ATiltedTree/setup-rust@v1
+        uses: actions-rs/toolchain@v1
         with:
-          rust-version: stable
+          toolchain: stable
 
       - name: Lint
         run: cargo clippy
