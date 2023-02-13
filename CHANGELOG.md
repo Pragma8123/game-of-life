@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Pragma8123/game-of-life/compare/v1.2.0...v1.2.1) (2023-02-13)
+
+
+### Bug Fixes
+
+* **cli:** :bug: ensure --speed is at least 1 ([14eadce](https://github.com/Pragma8123/game-of-life/commit/14eadcec0c851cf8dc5e98063e23c509566c0a36))
+
 # [1.2.0](https://github.com/Pragma8123/game-of-life/compare/v1.1.2...v1.2.0) (2023-02-13)
 
 
