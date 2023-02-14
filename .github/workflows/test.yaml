@@ -21,11 +21,6 @@ jobs:
       - name: Install release dependencies
         run: npm ci
 
-      - name: Setup rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
       - name: Lint
         run: cargo clippy
 
