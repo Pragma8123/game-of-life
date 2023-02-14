@@ -3,8 +3,8 @@ extern crate clap;
 mod game_of_life;
 
 use crate::game_of_life::Game;
+use clap::{value_parser, Parser};
 use std::{thread, time::Duration, time::Instant};
-use clap::{Parser, value_parser};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
