@@ -5,7 +5,7 @@ use drawille::Canvas;
 use rand::Rng;
 
 pub struct Game {
-    canvas: Canvas,
+    grid: Vec<Vec<bool>>,
     width: u32,
     height: u32,
     generations: u64,
@@ -14,7 +14,7 @@ pub struct Game {
 impl Game {
     pub fn new(width: u32, height: u32) -> Self {
         Self {
-            canvas: Self::generate_random_canvas(width, height),
+            grid: Self::generate_random_grid(width, height),
             width,
             height,
             generations: 0,
@@ -22,30 +22,38 @@ impl Game {
     }
 
     pub fn tick(&mut self) {
-        let mut new_canvas = Canvas::new(self.width, self.height);
+        let mut new_grid = vec![vec![false; self.height as usize]; self.width as usize];
 
         for x in 0..self.width {
             for y in 0..self.height {
                 let neighbors = self.count_neighbors(x, y);
-                if self.canvas.get(x, y) {
+                if self.grid[x as usize][y as usize] {
                     if neighbors == 2 || neighbors == 3 {
-                        new_canvas.set(x, y);
+                        new_grid[x as usize][y as usize] = true;
                     }
                 } else if neighbors == 3 {
-                    new_canvas.set(x, y);
+                    new_grid[x as usize][y as usize] = true;
                 }
             }
         }
 
-        self.canvas = new_canvas;
+        self.grid = new_grid;
         self.generations += 1;
     }
 
     pub fn draw(&self) -> String {
+        let mut canvas = Canvas::new(self.width, self.height);
+        for x in 0..self.width {
+            for y in 0..self.height {
+                if self.grid[x as usize][y as usize] {
+                    canvas.set(x, y);
+                }
+            }
+        }
         format!(
             "{}[2J{}\nGeneration: {}",
             27 as char,
-            self.canvas.frame(),
+            canvas.frame(),
             self.generations
         )
     }
@@ -55,28 +63,32 @@ impl Game {
 
         for i in x.saturating_sub(1)..x.min(self.width - 2) + 2 {
             for j in y.saturating_sub(1)..y.min(self.width - 2) + 2 {
-                if self.canvas.get(i, j) {
+                if self.grid[i as usize][j as usize] {
                     count += 1;
                 }
             }
         }
 
-        if self.canvas.get(x, y) {
+        if self.grid[x as usize][y as usize] {
             count -= 1;
         }
 
         count
     }
 
-    fn generate_random_canvas(width: u32, height: u32) -> Canvas {
-        let mut canvas = Canvas::new(width, height);
+    fn generate_random_grid(width: u32, height: u32) -> Vec<Vec<bool>> {
         let mut rng = rand::thread_rng();
+        let mut grid = Vec::new();
 
-        for _i in 0..width * height {
-            canvas.set(rng.gen_range(0..width), rng.gen_range(0..height));
+        for _ in 0..width {
+            let mut row = Vec::new();
+            for _ in 0..height {
+                row.push(rng.gen_bool(0.5));
+            }
+            grid.push(row);
         }
 
-        canvas
+        grid
     }
 }
 

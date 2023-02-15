@@ -32,6 +32,7 @@ fn main() {
         game.tick();
         println!("{}", game.draw());
         let elapsed = start.elapsed();
+        println!("Tick/Draw time: {:?}", elapsed);
         if elapsed < frame_duration {
             thread::sleep(frame_duration - elapsed);
         }
