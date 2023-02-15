@@ -1,5 +1,3 @@
-extern crate clap;
-
 mod game_of_life;
 
 use crate::game_of_life::Game;

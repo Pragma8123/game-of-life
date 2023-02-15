@@ -1,6 +1,3 @@
-extern crate drawille;
-extern crate rand;
-
 use drawille::Canvas;
 use rand::Rng;
 
