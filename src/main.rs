@@ -7,15 +7,15 @@ use std::{thread, time::Duration, time::Instant};
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
 struct Args {
-    /// Width of the game board
-    #[arg(short = 'W', long, default_value = "100")]
+    /// Width of the game board (Minimum: 2)
+    #[arg(short = 'W', long, default_value = "100", value_parser = value_parser!(u32).range(2..))]
     width: u32,
 
-    /// Height of the game board
-    #[arg(short = 'H', long, default_value = "100")]
+    /// Height of the game board (Minimum: 2)
+    #[arg(short = 'H', long, default_value = "100", value_parser = value_parser!(u32).range(2..))]
     height: u32,
 
-    /// Simulation speed in generations per second
+    /// Simulation speed in generations per second (Minimum: 1)
     #[arg(short = 'S', long, default_value = "10", value_parser = value_parser!(u8).range(1..))]
     speed: u8,
 }
