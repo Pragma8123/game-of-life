@@ -59,7 +59,7 @@ impl Game {
         let mut count = 0;
 
         for i in x.saturating_sub(1)..x.min(self.width - 2) + 2 {
-            for j in y.saturating_sub(1)..y.min(self.width - 2) + 2 {
+            for j in y.saturating_sub(1)..y.min(self.height - 2) + 2 {
                 if self.grid[i as usize][j as usize] {
                     count += 1;
                 }
