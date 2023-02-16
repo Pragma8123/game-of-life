@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/Pragma8123/game-of-life/compare/v1.2.2...v1.2.3) (2023-02-16)
+
+
+### Bug Fixes
+
+* **GameOfLife:** :bug: fix out of bounds error when counting neighbors ([d8584ac](https://github.com/Pragma8123/game-of-life/commit/d8584ac8f4dbec1e0d0c8b1839f6fc0a221412f6))
+
 ## [1.2.2](https://github.com/Pragma8123/game-of-life/compare/v1.2.1...v1.2.2) (2023-02-16)
 
 
