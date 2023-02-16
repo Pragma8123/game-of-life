@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/Pragma8123/game-of-life/compare/v1.2.1...v1.2.2) (2023-02-16)
+
+
+### Bug Fixes
+
+* **cli:** :bug: ensure width and height are at least 2 ([673510d](https://github.com/Pragma8123/game-of-life/commit/673510dc4033bab824f1b2f3459d6f3a7412074c))
+
 ## [1.2.1](https://github.com/Pragma8123/game-of-life/compare/v1.2.0...v1.2.1) (2023-02-13)
 
 
