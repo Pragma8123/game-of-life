@@ -7,6 +7,6 @@ edition = "2021"
 readme = "README.md"
 
 [dependencies]
-clap = { version = "4.1.4", features = ["derive"] }
+clap = { version = "4.1.11", features = ["derive"] }
 drawille = "*"
 rand = "*"
