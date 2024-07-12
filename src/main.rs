@@ -23,14 +23,20 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let frame_duration = Duration::from_secs(1) / args.speed as u32;
     let mut game = Game::new(args.width, args.height);
+
+    let frame_duration = Duration::from_secs(1) / args.speed as u32;
     loop {
         let start = Instant::now();
+
         game.tick();
+
+        // TODO: Optimize drawing frame to terminal
         println!("{}", game.draw());
+
         let elapsed = start.elapsed();
         println!("Tick/Draw time: {:?}", elapsed);
+
         if elapsed < frame_duration {
             thread::sleep(frame_duration - elapsed);
         }
