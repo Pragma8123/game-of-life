@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use drawille::Canvas;
+use drawille::{Canvas, PixelColor};
 use rand::Rng;
 
 pub struct Game {
@@ -22,7 +22,7 @@ impl Game {
             width,
             height,
             generations: 0,
-            canvas: Canvas::new(width, height + 1),
+            canvas: Canvas::new(width + 2, height + 2), // Add margin for borders
             last_tick: Duration::new(0, 0),
         }
     }
@@ -51,11 +51,34 @@ impl Game {
     }
 
     pub fn draw(&mut self) -> io::Result<()> {
+        // Clear canvas
         self.canvas.clear();
+
+        // Draw borders
+        self.canvas
+            .line_colored(0, 0, self.width + 2, 0, PixelColor::Green); // Top
+        self.canvas
+            .line_colored(0, 0, 0, self.height + 2, PixelColor::Green); // Left
+        self.canvas.line_colored(
+            self.width + 2,
+            0,
+            self.width + 2,
+            self.height + 2,
+            PixelColor::Green,
+        ); // Right
+        self.canvas.line_colored(
+            0,
+            self.height + 2,
+            self.width + 2,
+            self.height + 2,
+            PixelColor::Green,
+        ); // Bottom
+
+        // Draw cells
         for x in 0..self.width {
             for y in 0..self.height {
                 if self.grid[x as usize][y as usize] {
-                    self.canvas.set(x, y);
+                    self.canvas.set_colored(x, y, PixelColor::BrightGreen);
                 }
             }
         }
