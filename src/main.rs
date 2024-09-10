@@ -2,7 +2,15 @@ mod game_of_life;
 
 use crate::game_of_life::Game;
 use clap::{value_parser, Parser};
-use std::{thread, time::Duration, time::Instant};
+use std::{
+    io::{stdout, Write},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    thread,
+    time::{Duration, Instant},
+};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
@@ -26,21 +34,40 @@ fn main() {
     let mut game = Game::new(args.width, args.height);
 
     let frame_duration = Duration::from_secs(1) / args.speed as u32;
-    loop {
+
+    print!("\x1B[2J"); // Clear screen
+    print!("\x1B[?25l"); // Hide cursor
+    stdout().flush().unwrap();
+
+    let running = Arc::new(AtomicBool::new(true));
+    let r = Arc::clone(&running);
+
+    ctrlc::set_handler(move || {
+        // Show the cursor again
+        print!("\x1B[?25h");
+
+        // Set the running flag to false to exit the loop
+        r.store(false, Ordering::SeqCst);
+    })
+    .expect("Error setting Ctrl-C handler");
+
+    // Main game loop
+    while running.load(Ordering::SeqCst) {
         let start = Instant::now();
 
         game.tick();
 
-        // TODO: Optimize drawing frame to terminal
-        println!("{}", game.draw());
+        game.draw().unwrap();
 
         let elapsed = start.elapsed();
-        println!("Tick/Draw time: {:?}", elapsed);
 
         if elapsed < frame_duration {
             thread::sleep(frame_duration - elapsed);
         }
     }
+
+    // Ensure cursor is shown again before exiting
+    print!("\x1B[?25h");
 }
 
 #[test]

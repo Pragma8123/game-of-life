@@ -1,3 +1,8 @@
+use std::{
+    io::{self, stdout, Write},
+    time::{Duration, Instant},
+};
+
 use drawille::Canvas;
 use rand::Rng;
 
@@ -6,6 +11,8 @@ pub struct Game {
     width: u32,
     height: u32,
     generations: u64,
+    canvas: Canvas,
+    last_tick: Duration,
 }
 
 impl Game {
@@ -15,10 +22,14 @@ impl Game {
             width,
             height,
             generations: 0,
+            canvas: Canvas::new(width, height + 1),
+            last_tick: Duration::new(0, 0),
         }
     }
 
     pub fn tick(&mut self) {
+        let start = Instant::now();
+
         let mut new_grid = vec![vec![false; self.height as usize]; self.width as usize];
 
         for x in 0..self.width {
@@ -34,25 +45,41 @@ impl Game {
             }
         }
 
+        self.last_tick = start.elapsed();
         self.grid = new_grid;
         self.generations += 1;
     }
 
-    pub fn draw(&self) -> String {
-        let mut canvas = Canvas::new(self.width, self.height);
+    pub fn draw(&mut self) -> io::Result<()> {
+        self.canvas.clear();
         for x in 0..self.width {
             for y in 0..self.height {
                 if self.grid[x as usize][y as usize] {
-                    canvas.set(x, y);
+                    self.canvas.set(x, y);
                 }
             }
         }
-        format!(
-            "{}[2J{}\nGeneration: {}",
-            27 as char,
-            canvas.frame(),
-            self.generations
-        )
+
+        // Generations
+        self.canvas.text(
+            0,
+            self.height - 1,
+            self.width,
+            format!("Generations: {}", self.generations).as_str(),
+        );
+
+        // Tick time
+        self.canvas.text(
+            0,
+            self.height,
+            self.width,
+            format!("Tick Time: {:?}", self.last_tick).as_str(),
+        );
+
+        // Set cursor to 0,0 and write
+        print!("\x1B[H{}", self.canvas.frame());
+        stdout().flush()?;
+        Ok(())
     }
 
     fn count_neighbors(&self, x: u32, y: u32) -> u32 {
