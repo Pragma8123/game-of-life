@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Pragma8123/game-of-life/compare/v1.2.3...v1.3.0) (2024-09-10)
+
+
+### Features
+
+* improve visual quality of rendering ([802f83d](https://github.com/Pragma8123/game-of-life/commit/802f83d8a1930bff290ea050fef3fe746e601926))
+
 ## [1.2.3](https://github.com/Pragma8123/game-of-life/compare/v1.2.2...v1.2.3) (2023-02-16)
 
 
