@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Pragma8123/game-of-life/compare/v1.3.0...v1.3.1) (2024-09-10)
+
+
+### Bug Fixes
+
+* re-release ([d20f094](https://github.com/Pragma8123/game-of-life/commit/d20f094312d4a519962ac393e093382414c924f1))
+
 # [1.3.0](https://github.com/Pragma8123/game-of-life/compare/v1.2.3...v1.3.0) (2024-09-10)
 
 
