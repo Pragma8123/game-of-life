@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Pragma8123/game-of-life/compare/v1.3.1...v1.4.0) (2024-09-10)
+
+
+### Features
+
+* add color and borders to game view ([cd8f6f4](https://github.com/Pragma8123/game-of-life/commit/cd8f6f4212159c377950b06986a9a2b6ebef861a))
+
 ## [1.3.1](https://github.com/Pragma8123/game-of-life/compare/v1.3.0...v1.3.1) (2024-09-10)
 
 
