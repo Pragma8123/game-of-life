@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/Pragma8123/game-of-life/compare/v1.5.0...v1.5.1) (2024-09-12)
+
+
+### Bug Fixes
+
+* switch from term_size crate to terminal_size ([ae64eb4](https://github.com/Pragma8123/game-of-life/commit/ae64eb48f98cd553e88c042273a76f0721d7f408))
+
 # [1.5.0](https://github.com/Pragma8123/game-of-life/compare/v1.4.0...v1.5.0) (2024-09-12)
 
 
