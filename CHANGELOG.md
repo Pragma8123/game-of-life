@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Pragma8123/game-of-life/compare/v1.4.0...v1.5.0) (2024-09-12)
+
+
+### Features
+
+* add full-screen option ([a7d1fad](https://github.com/Pragma8123/game-of-life/commit/a7d1fad923136bf91f2454c91dd68f906eafa720))
+
 # [1.4.0](https://github.com/Pragma8123/game-of-life/compare/v1.3.1...v1.4.0) (2024-09-10)
 
 
