@@ -18,11 +18,11 @@ pub struct Game {
 impl Game {
     pub fn new(width: u32, height: u32) -> Self {
         Self {
-            grid: Self::generate_random_grid(width, height),
-            width,
-            height,
+            grid: Self::generate_random_grid(width - 2, height - 2),
+            width: width - 2,
+            height: height - 2,
             generations: 0,
-            canvas: Canvas::new(width + 2, height + 2), // Add margin for borders
+            canvas: Canvas::new(width, height), // Add margin for borders
             last_tick: Duration::new(0, 0),
         }
     }
@@ -86,7 +86,7 @@ impl Game {
         // Generations
         self.canvas.text(
             0,
-            self.height - 1,
+            self.height - 8,
             self.width,
             format!("Generations: {}", self.generations).as_str(),
         );
@@ -94,7 +94,7 @@ impl Game {
         // Tick time
         self.canvas.text(
             0,
-            self.height,
+            self.height - 4,
             self.width,
             format!("Tick Time: {:?}", self.last_tick).as_str(),
         );

@@ -26,12 +26,32 @@ struct Args {
     /// Simulation speed in generations per second (Minimum: 1)
     #[arg(short = 'S', long, default_value = "10", value_parser = value_parser!(u8).range(1..))]
     speed: u8,
+
+    /// Full screen
+    #[arg(short = 'F', long)]
+    full: bool,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let mut game = Game::new(args.width, args.height);
+    let width;
+    let height;
+
+    if args.full {
+        if let Some((w, h)) = term_size::dimensions() {
+            width = ((w * 2) - 2) as u32;
+            height = ((h * 4) - 2) as u32;
+        } else {
+            width = args.width;
+            height = args.height;
+        }
+    } else {
+        width = args.width;
+        height = args.height;
+    }
+
+    let mut game = Game::new(width, height);
 
     let frame_duration = Duration::from_secs(1) / args.speed as u32;
 
