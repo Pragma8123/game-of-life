@@ -11,6 +11,7 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+use terminal_size::{terminal_size, Height, Width};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
@@ -39,7 +40,7 @@ fn main() {
     let height;
 
     if args.full {
-        if let Some((w, h)) = term_size::dimensions() {
+        if let Some((Width(w), Height(h))) = terminal_size() {
             width = ((w * 2) - 2) as u32;
             height = ((h * 4) - 2) as u32;
         } else {
