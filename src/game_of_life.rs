@@ -124,13 +124,13 @@ impl Game {
     }
 
     fn generate_random_grid(width: u32, height: u32) -> Vec<Vec<bool>> {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let mut grid = Vec::new();
 
         for _ in 0..width {
             let mut row = Vec::new();
             for _ in 0..height {
-                row.push(rng.gen_bool(0.5));
+                row.push(rng.random_bool(0.5));
             }
             grid.push(row);
         }
