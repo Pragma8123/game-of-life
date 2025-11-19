@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/Pragma8123/game-of-life/compare/v1.5.1...v1.5.2) (2025-11-19)
+
+
+### Bug Fixes
+
+* move away from deprecated rng code ([7a04f85](https://github.com/Pragma8123/game-of-life/commit/7a04f85993d5cf58a559fe708aa00207624f5ffa))
+
 ## [1.5.1](https://github.com/Pragma8123/game-of-life/compare/v1.5.0...v1.5.1) (2024-09-12)
 
 
