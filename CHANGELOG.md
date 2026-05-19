@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/Pragma8123/game-of-life/compare/v1.5.2...v1.5.3) (2026-05-19)
+
+
+### Bug Fixes
+
+* correct dep scope error for rand ([36396c2](https://github.com/Pragma8123/game-of-life/commit/36396c243e3a9081c4f393035b73cd72038fbce8))
+
 ## [1.5.2](https://github.com/Pragma8123/game-of-life/compare/v1.5.1...v1.5.2) (2025-11-19)
 
 
