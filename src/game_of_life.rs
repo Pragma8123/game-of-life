@@ -4,7 +4,7 @@ use std::{
 };
 
 use drawille::{Canvas, PixelColor};
-use rand::Rng;
+use rand::*;
 
 pub struct Game {
     grid: Vec<Vec<bool>>,
