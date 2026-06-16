@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/Pragma8123/game-of-life/compare/v1.6.1...v1.6.2) (2026-06-16)
+
+
+### Reverts
+
+* Revert "chore: update npm deps" ([9b2f89f](https://github.com/Pragma8123/game-of-life/commit/9b2f89f832fe934e219d6d88b6242931ac9c21f3))
+
 ## [1.6.1](https://github.com/Pragma8123/game-of-life/compare/v1.6.0...v1.6.1) (2026-06-16)
 
 
