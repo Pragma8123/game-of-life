@@ -1,6 +1,6 @@
 mod game_of_life;
 
-use crate::game_of_life::Game;
+use crate::game_of_life::{Game, Renderer};
 use clap::{value_parser, Parser};
 use std::{
     io::{stdout, Write},
@@ -41,8 +41,8 @@ fn main() {
 
     if args.full {
         if let Some((Width(w), Height(h))) = terminal_size() {
-            width = ((w * 2) - 2) as u32;
-            height = ((h * 4) - 2) as u32;
+            width = (((w * 2) as i32) - 2).max(2) as u32;
+            height = (((h * 4) as i32) - 2).max(2) as u32;
         } else {
             width = args.width;
             height = args.height;
@@ -53,6 +53,7 @@ fn main() {
     }
 
     let mut game = Game::new(width, height);
+    let mut renderer = Renderer::new(width, height);
 
     let frame_duration = Duration::from_secs(1) / args.speed as u32;
 
@@ -78,7 +79,7 @@ fn main() {
 
         game.tick();
 
-        game.draw().unwrap();
+        renderer.draw(&game).unwrap();
 
         let elapsed = start.elapsed();
 

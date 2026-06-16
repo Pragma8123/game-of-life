@@ -7,141 +7,205 @@ use drawille::{Canvas, PixelColor};
 use rand::*;
 
 pub struct Game {
-    grid: Vec<Vec<bool>>,
+    grid: Vec<bool>,
+    next_grid: Vec<bool>,
     width: u32,
     height: u32,
     generations: u64,
-    canvas: Canvas,
     last_tick: Duration,
 }
 
 impl Game {
     pub fn new(width: u32, height: u32) -> Self {
+        let sim_width = width.saturating_sub(2);
+        let sim_height = height.saturating_sub(2);
+
+        let size = (sim_width as usize) * (sim_height as usize);
+        let grid = Self::generate_random_grid(sim_width, sim_height);
+        let next_grid = vec![false; size];
+
         Self {
-            grid: Self::generate_random_grid(width - 2, height - 2),
-            width: width - 2,
-            height: height - 2,
+            grid,
+            next_grid,
+            width: sim_width,
+            height: sim_height,
             generations: 0,
-            canvas: Canvas::new(width, height), // Add margin for borders
             last_tick: Duration::new(0, 0),
         }
     }
 
     pub fn tick(&mut self) {
+        if self.width == 0 || self.height == 0 {
+            return;
+        }
         let start = Instant::now();
-
-        let mut new_grid = vec![vec![false; self.height as usize]; self.width as usize];
 
         for x in 0..self.width {
             for y in 0..self.height {
                 let neighbors = self.count_neighbors(x, y);
-                if self.grid[x as usize][y as usize] {
-                    if neighbors == 2 || neighbors == 3 {
-                        new_grid[x as usize][y as usize] = true;
-                    }
-                } else if neighbors == 3 {
-                    new_grid[x as usize][y as usize] = true;
-                }
+                let idx = self.index(x, y);
+                let alive = self.grid[idx];
+                let next_alive = if alive {
+                    neighbors == 2 || neighbors == 3
+                } else {
+                    neighbors == 3
+                };
+                self.next_grid[idx] = next_alive;
             }
         }
 
+        std::mem::swap(&mut self.grid, &mut self.next_grid);
         self.last_tick = start.elapsed();
-        self.grid = new_grid;
         self.generations += 1;
     }
 
-    pub fn draw(&mut self) -> io::Result<()> {
-        // Clear canvas
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn generations(&self) -> u64 {
+        self.generations
+    }
+
+    pub fn last_tick(&self) -> Duration {
+        self.last_tick
+    }
+
+    pub fn get_cell(&self, x: u32, y: u32) -> bool {
+        if x < self.width && y < self.height {
+            self.grid[self.index(x, y)]
+        } else {
+            false
+        }
+    }
+
+    #[inline]
+    fn index(&self, x: u32, y: u32) -> usize {
+        (y * self.width + x) as usize
+    }
+
+    fn count_neighbors(&self, x: u32, y: u32) -> u32 {
+        let mut count = 0;
+        let x_start = x.saturating_sub(1);
+        let x_end = (x + 1).min(self.width.saturating_sub(1));
+        let y_start = y.saturating_sub(1);
+        let y_end = (y + 1).min(self.height.saturating_sub(1));
+
+        for i in x_start..=x_end {
+            for j in y_start..=y_end {
+                if (i != x || j != y) && self.grid[self.index(i, j)] {
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+
+    fn generate_random_grid(width: u32, height: u32) -> Vec<bool> {
+        let mut rng = rand::rng();
+        let size = (width as usize) * (height as usize);
+        let mut grid = Vec::with_capacity(size);
+        for _ in 0..size {
+            grid.push(rng.random_bool(0.5));
+        }
+        grid
+    }
+}
+
+pub struct Renderer {
+    canvas: Canvas,
+}
+
+impl Renderer {
+    pub fn new(width: u32, height: u32) -> Self {
+        Self {
+            canvas: Canvas::new(width, height),
+        }
+    }
+
+    pub fn draw(&mut self, game: &Game) -> io::Result<()> {
         self.canvas.clear();
 
-        // Draw borders
+        let width = game.width();
+        let height = game.height();
+
+        // Draw borders at 0 and width + 1, height + 1 (representing actual bounds)
         self.canvas
-            .line_colored(0, 0, self.width + 2, 0, PixelColor::Green); // Top
+            .line_colored(0, 0, width + 1, 0, PixelColor::Green); // Top
         self.canvas
-            .line_colored(0, 0, 0, self.height + 2, PixelColor::Green); // Left
+            .line_colored(0, 0, 0, height + 1, PixelColor::Green); // Left
         self.canvas.line_colored(
-            self.width + 2,
+            width + 1,
             0,
-            self.width + 2,
-            self.height + 2,
+            width + 1,
+            height + 1,
             PixelColor::Green,
         ); // Right
         self.canvas.line_colored(
             0,
-            self.height + 2,
-            self.width + 2,
-            self.height + 2,
+            height + 1,
+            width + 1,
+            height + 1,
             PixelColor::Green,
         ); // Bottom
 
-        // Draw cells
-        for x in 0..self.width {
-            for y in 0..self.height {
-                if self.grid[x as usize][y as usize] {
-                    self.canvas.set_colored(x, y, PixelColor::BrightGreen);
+        // Draw cells offset by 1
+        for x in 0..width {
+            for y in 0..height {
+                if game.get_cell(x, y) {
+                    self.canvas.set_colored(x + 1, y + 1, PixelColor::BrightGreen);
                 }
             }
         }
 
-        // Generations
-        self.canvas.text(
-            0,
-            self.height - 8,
-            self.width,
-            format!("Generations: {}", self.generations).as_str(),
-        );
+        // Generations text
+        if height >= 8 {
+            self.canvas.text(
+                0,
+                height - 8,
+                width,
+                format!("Generations: {}", game.generations()).as_str(),
+            );
+        }
 
-        // Tick time
-        self.canvas.text(
-            0,
-            self.height - 4,
-            self.width,
-            format!("Tick Time: {:?}", self.last_tick).as_str(),
-        );
+        // Tick time text
+        if height >= 4 {
+            self.canvas.text(
+                0,
+                height - 4,
+                width,
+                format!("Tick Time: {:?}", game.last_tick()).as_str(),
+            );
+        }
 
         // Set cursor to 0,0 and write
         print!("\x1B[H{}", self.canvas.frame());
         stdout().flush()?;
         Ok(())
     }
-
-    fn count_neighbors(&self, x: u32, y: u32) -> u32 {
-        let mut count = 0;
-
-        for i in x.saturating_sub(1)..x.min(self.width - 2) + 2 {
-            for j in y.saturating_sub(1)..y.min(self.height - 2) + 2 {
-                if self.grid[i as usize][j as usize] {
-                    count += 1;
-                }
-            }
-        }
-
-        if self.grid[x as usize][y as usize] {
-            count -= 1;
-        }
-
-        count
-    }
-
-    fn generate_random_grid(width: u32, height: u32) -> Vec<Vec<bool>> {
-        let mut rng = rand::rng();
-        let mut grid = Vec::new();
-
-        for _ in 0..width {
-            let mut row = Vec::new();
-            for _ in 0..height {
-                row.push(rng.random_bool(0.5));
-            }
-            grid.push(row);
-        }
-
-        grid
-    }
 }
 
-#[test]
-fn verify_game() {
-    let mut game = Game::new(100, 100);
-    game.tick();
-    assert_eq!(game.generations, 1);
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_game() {
+        let mut game = Game::new(100, 100);
+        game.tick();
+        assert_eq!(game.generations(), 1);
+    }
+
+    #[test]
+    fn verify_small_dimensions() {
+        let mut game = Game::new(2, 2);
+        assert_eq!(game.width(), 0);
+        assert_eq!(game.height(), 0);
+        game.tick();
+        assert_eq!(game.generations(), 0);
+    }
 }
