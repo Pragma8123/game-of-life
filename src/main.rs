@@ -14,7 +14,20 @@ use std::{
 use terminal_size::{terminal_size, Height, Width};
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "A simple implementation of Conway's Game of Life", long_about = None)]
+#[command(
+    author,
+    version,
+    about = "A simple implementation of Conway's Game of Life",
+    long_about = "A simple implementation of Conway's Game of Life using Drawille for high-resolution terminal rendering.\n\n\
+                  Interactive Hotkeys (During Simulation):\n  \
+                    Space      Pause / Resume\n  \
+                    s / n      Single step (when paused)\n  \
+                    w          Toggle border wrapping (Toroidal vs Closed)\n  \
+                    + / -      Speed up / Slow down (or Arrow keys)\n  \
+                    1 - 4      Stamp preset patterns (Glider, Gosper Gun, Pulsar, LWSS)\n  \
+                    h / ?      Show help overlay\n  \
+                    q / Esc    Quit"
+)]
 struct Args {
     /// Width of the game board (Minimum: 2)
     #[arg(short = 'W', long, default_value = "100", value_parser = value_parser!(u32).range(2..))]
@@ -92,9 +105,10 @@ fn main() {
     .expect("Error setting Ctrl-C handler");
 
     let mut paused = false;
+    let mut show_help = false;
 
     // Draw the initial state
-    renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+    renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
 
     // Main game loop
     while running.load(Ordering::SeqCst) {
@@ -104,6 +118,23 @@ fn main() {
         // Process all pending input events
         while event::poll(Duration::from_millis(0)).unwrap_or(false) {
             if let Event::Key(key_event) = event::read().unwrap() {
+                if show_help {
+                    // When help overlay is showing, any keypress closes it (except quit keys)
+                    match key_event.code {
+                        KeyCode::Char('q') | KeyCode::Esc => {
+                            running.store(false, Ordering::SeqCst);
+                        }
+                        KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => {
+                            running.store(false, Ordering::SeqCst);
+                        }
+                        _ => {
+                            show_help = false;
+                            renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
+                        }
+                    }
+                    continue;
+                }
+
                 match key_event.code {
                     KeyCode::Char('q') | KeyCode::Esc => {
                         running.store(false, Ordering::SeqCst);
@@ -113,7 +144,7 @@ fn main() {
                     }
                     KeyCode::Char(' ') => {
                         paused = !paused;
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('s') | KeyCode::Char('n') => {
                         if paused {
@@ -122,33 +153,40 @@ fn main() {
                     }
                     KeyCode::Char('w') | KeyCode::Char('W') => {
                         wrap_enabled = !wrap_enabled;
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('+') | KeyCode::Char('=') | KeyCode::Up | KeyCode::Right => {
                         speed = (speed + 1).min(100);
                         frame_duration = Duration::from_secs(1) / speed;
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('-') | KeyCode::Char('_') | KeyCode::Down | KeyCode::Left => {
                         speed = (speed.saturating_sub(1)).max(1);
                         frame_duration = Duration::from_secs(1) / speed;
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
+                    }
+                    KeyCode::Char('h') | KeyCode::Char('?') => {
+                        show_help = !show_help;
+                        if show_help {
+                            paused = true;
+                        }
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('1') => {
                         game.stamp_pattern(1);
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('2') => {
                         game.stamp_pattern(2);
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('3') => {
                         game.stamp_pattern(3);
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     KeyCode::Char('4') => {
                         game.stamp_pattern(4);
-                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                        renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
                     }
                     _ => {}
                 }
@@ -161,7 +199,7 @@ fn main() {
 
         if !paused || step_requested {
             game.tick(wrap_enabled);
-            renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+            renderer.draw(&game, speed, wrap_enabled, paused, show_help).unwrap();
         }
 
         let elapsed = start.elapsed();

@@ -258,7 +258,7 @@ impl Renderer {
         }
     }
 
-    pub fn draw(&mut self, game: &Game, speed: u32, wrap_enabled: bool, paused: bool) -> io::Result<()> {
+    pub fn draw(&mut self, game: &Game, speed: u32, wrap_enabled: bool, paused: bool, show_help: bool) -> io::Result<()> {
         self.canvas.clear();
 
         let width = game.width();
@@ -292,6 +292,46 @@ impl Renderer {
                     self.canvas.set_colored(x + 1, y + 1, Self::age_color(cell.age));
                 }
             }
+        }
+
+        // Draw help overlay if active
+        if show_help {
+            let cx = width / 2;
+            let cy = height / 2;
+
+            let hw = 64;
+            let hh = 44;
+
+            let x1 = cx.saturating_sub(hw / 2);
+            let y1 = cy.saturating_sub(hh / 2);
+            let x2 = (cx + hw / 2).min(width + 1);
+            let y2 = (cy + hh / 2).min(height + 1);
+
+            // Clear background of the help box
+            for x in x1..=x2 {
+                for y in y1..=y2 {
+                    self.canvas.unset(x, y);
+                }
+            }
+
+            // Draw help box borders
+            self.canvas.line_colored(x1, y1, x2, y1, PixelColor::Yellow);
+            self.canvas.line_colored(x1, y1, x1, y2, PixelColor::Yellow);
+            self.canvas.line_colored(x2, y1, x2, y2, PixelColor::Yellow);
+            self.canvas.line_colored(x1, y2, x2, y2, PixelColor::Yellow);
+
+            // Print text lines inside the help box
+            let text_x = x1 + 4;
+            self.canvas.text(text_x, y1 + 4, x2 - x1 - 8, "    GAME OF LIFE CONTROLS");
+            self.canvas.text(text_x, y1 + 8, x2 - x1 - 8, "=============================");
+            self.canvas.text(text_x, y1 + 12, x2 - x1 - 8, "Space    : Pause / Resume");
+            self.canvas.text(text_x, y1 + 16, x2 - x1 - 8, "s / n    : Step frame (paused)");
+            self.canvas.text(text_x, y1 + 20, x2 - x1 - 8, "w        : Toggle wrapping");
+            self.canvas.text(text_x, y1 + 24, x2 - x1 - 8, "+ / -    : Speed up / slow down");
+            self.canvas.text(text_x, y1 + 28, x2 - x1 - 8, "1 - 4    : Stamp patterns");
+            self.canvas.text(text_x, y1 + 32, x2 - x1 - 8, "h / ?    : Toggle help overlay");
+            self.canvas.text(text_x, y1 + 36, x2 - x1 - 8, "q / Esc  : Quit game");
+            self.canvas.text(text_x, y1 + 40, x2 - x1 - 8, "Press any key to close help");
         }
 
         // HUD info at the bottom-left
@@ -329,7 +369,7 @@ impl Renderer {
             );
         }
         if height >= 20 {
-            let status_str = if paused { "PAUSED ('s' to step, '1-4' to stamp)" } else { "RUNNING (Space to pause)" };
+            let status_str = if paused { "PAUSED ('s' to step, '1-4' to stamp, 'h' for help)" } else { "RUNNING (Space to pause, 'h' for help)" };
             self.canvas.text(
                 2,
                 height - 20,
