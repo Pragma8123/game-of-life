@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Pragma8123/game-of-life/compare/v1.6.0...v1.6.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **input:** ignore key release events to prevent double triggering on Windows ([7834d13](https://github.com/Pragma8123/game-of-life/commit/7834d13d268959d172c541c0cf2d138017ee6a14))
+
 # [1.6.0](https://github.com/Pragma8123/game-of-life/compare/v1.5.3...v1.6.0) (2026-06-16)
 
 
