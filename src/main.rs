@@ -2,13 +2,13 @@ mod game_of_life;
 
 use crate::game_of_life::{Game, Renderer};
 use clap::{value_parser, Parser};
+use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use std::{
     io::{stdout, Write},
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    thread,
     time::{Duration, Instant},
 };
 use terminal_size::{terminal_size, Height, Width};
@@ -31,6 +31,25 @@ struct Args {
     /// Full screen
     #[arg(short = 'F', long)]
     full: bool,
+}
+
+struct TerminalGuard;
+
+impl TerminalGuard {
+    fn new() -> Self {
+        crossterm::terminal::enable_raw_mode().ok();
+        print!("\x1B[?25l"); // Hide cursor
+        stdout().flush().ok();
+        TerminalGuard
+    }
+}
+
+impl Drop for TerminalGuard {
+    fn drop(&mut self) {
+        print!("\x1B[?25h"); // Show cursor
+        stdout().flush().ok();
+        crossterm::terminal::disable_raw_mode().ok();
+    }
 }
 
 fn main() {
@@ -58,38 +77,70 @@ fn main() {
     let frame_duration = Duration::from_secs(1) / args.speed as u32;
 
     print!("\x1B[2J"); // Clear screen
-    print!("\x1B[?25l"); // Hide cursor
     stdout().flush().unwrap();
+
+    let _guard = TerminalGuard::new();
 
     let running = Arc::new(AtomicBool::new(true));
     let r = Arc::clone(&running);
 
     ctrlc::set_handler(move || {
-        // Show the cursor again
-        print!("\x1B[?25h");
-
-        // Set the running flag to false to exit the loop
         r.store(false, Ordering::SeqCst);
     })
     .expect("Error setting Ctrl-C handler");
 
+    let mut paused = false;
+
     // Main game loop
     while running.load(Ordering::SeqCst) {
         let start = Instant::now();
+        let mut step_requested = false;
 
-        game.tick();
+        // Process all pending input events
+        while event::poll(Duration::from_millis(0)).unwrap_or(false) {
+            if let Event::Key(key_event) = event::read().unwrap() {
+                match key_event.code {
+                    KeyCode::Char('q') | KeyCode::Esc => {
+                        running.store(false, Ordering::SeqCst);
+                    }
+                    KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => {
+                        running.store(false, Ordering::SeqCst);
+                    }
+                    KeyCode::Char(' ') => {
+                        paused = !paused;
+                    }
+                    KeyCode::Char('s') | KeyCode::Char('n') => {
+                        if paused {
+                            step_requested = true;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
 
-        renderer.draw(&game).unwrap();
+        if !running.load(Ordering::SeqCst) {
+            break;
+        }
+
+        if !paused || step_requested {
+            game.tick();
+            renderer.draw(&game).unwrap();
+        }
 
         let elapsed = start.elapsed();
 
-        if elapsed < frame_duration {
-            thread::sleep(frame_duration - elapsed);
+        if paused {
+            if let Ok(true) = event::poll(Duration::from_millis(100)) {
+                // Next iteration will read the event
+            }
+        } else if elapsed < frame_duration {
+            let wait_time = frame_duration - elapsed;
+            if let Ok(true) = event::poll(wait_time) {
+                // Next iteration will read the event
+            }
         }
     }
-
-    // Ensure cursor is shown again before exiting
-    print!("\x1B[?25h");
 }
 
 #[test]
