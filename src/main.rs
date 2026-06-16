@@ -74,7 +74,9 @@ fn main() {
     let mut game = Game::new(width, height);
     let mut renderer = Renderer::new(width, height);
 
-    let frame_duration = Duration::from_secs(1) / args.speed as u32;
+    let mut speed = args.speed as u32;
+    let mut frame_duration = Duration::from_secs(1) / speed;
+    let mut wrap_enabled = true;
 
     print!("\x1B[2J"); // Clear screen
     stdout().flush().unwrap();
@@ -90,6 +92,9 @@ fn main() {
     .expect("Error setting Ctrl-C handler");
 
     let mut paused = false;
+
+    // Draw the initial state
+    renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
 
     // Main game loop
     while running.load(Ordering::SeqCst) {
@@ -108,11 +113,42 @@ fn main() {
                     }
                     KeyCode::Char(' ') => {
                         paused = !paused;
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
                     }
                     KeyCode::Char('s') | KeyCode::Char('n') => {
                         if paused {
                             step_requested = true;
                         }
+                    }
+                    KeyCode::Char('w') | KeyCode::Char('W') => {
+                        wrap_enabled = !wrap_enabled;
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('+') | KeyCode::Char('=') | KeyCode::Up | KeyCode::Right => {
+                        speed = (speed + 1).min(100);
+                        frame_duration = Duration::from_secs(1) / speed;
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('-') | KeyCode::Char('_') | KeyCode::Down | KeyCode::Left => {
+                        speed = (speed.saturating_sub(1)).max(1);
+                        frame_duration = Duration::from_secs(1) / speed;
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('1') => {
+                        game.stamp_pattern(1);
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('2') => {
+                        game.stamp_pattern(2);
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('3') => {
+                        game.stamp_pattern(3);
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
+                    }
+                    KeyCode::Char('4') => {
+                        game.stamp_pattern(4);
+                        renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
                     }
                     _ => {}
                 }
@@ -124,8 +160,8 @@ fn main() {
         }
 
         if !paused || step_requested {
-            game.tick();
-            renderer.draw(&game).unwrap();
+            game.tick(wrap_enabled);
+            renderer.draw(&game, speed, wrap_enabled, paused).unwrap();
         }
 
         let elapsed = start.elapsed();
