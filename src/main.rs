@@ -118,6 +118,9 @@ fn main() {
         // Process all pending input events
         while event::poll(Duration::from_millis(0)).unwrap_or(false) {
             if let Event::Key(key_event) = event::read().unwrap() {
+                if key_event.kind == event::KeyEventKind::Release {
+                    continue;
+                }
                 if show_help {
                     // When help overlay is showing, any keypress closes it (except quit keys)
                     match key_event.code {
