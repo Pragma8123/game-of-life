@@ -182,8 +182,9 @@ impl Renderer {
             );
         }
 
-        // Set cursor to 0,0 and write
-        print!("\x1B[H{}", self.canvas.frame());
+        // Set cursor to 0,0 and write (replacing \n with \r\n for raw terminal mode compatibility)
+        let frame = self.canvas.frame().replace('\n', "\r\n");
+        print!("\x1B[H{}", frame);
         stdout().flush()?;
         Ok(())
     }
