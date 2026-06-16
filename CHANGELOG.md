@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/Pragma8123/game-of-life/compare/v1.5.3...v1.6.0) (2026-06-16)
+
+
+### Bug Fixes
+
+* replace newlines with carriage returns in raw terminal mode ([65311b2](https://github.com/Pragma8123/game-of-life/commit/65311b2904604d482eeec80620b958d35a547e92))
+
+
+### Features
+
+* add interactive in-game help screen and update clap help description ([544ea4a](https://github.com/Pragma8123/game-of-life/commit/544ea4aaa5bf92fce5acc84d2899ed1cd07e43e6))
+* add speed controls, toroidal wrapping, age-based heatmaps, and pattern stamping ([fdf4b96](https://github.com/Pragma8123/game-of-life/commit/fdf4b968190d1f3f7e7b51ee9e15ef7c7908e60b))
+* integrate crossterm for raw mode and non-blocking input handling ([13c9095](https://github.com/Pragma8123/game-of-life/commit/13c90958b1b76e8b594358865799c63e9b903515))
+
 ## [1.5.3](https://github.com/Pragma8123/game-of-life/compare/v1.5.2...v1.5.3) (2026-05-19)
 
 
